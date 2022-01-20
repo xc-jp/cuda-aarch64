@@ -77,7 +77,11 @@ stdenv.mkDerivation rec {
     alsa-lib
   ];
 
-  rpath = "${lib.makeLibraryPath runtimeDependencies}:${stdenv.cc.cc.lib}/lib64";
+  # for some reason libgcc doesn't live in the top-level directory for our
+  # cross compilation toolchain, we use the UGLY hack to refer to the
+  # aarch64-unknown-linux-gnu where it actually lives directly because
+  # otherwise nvcc find libgcc_s.so.1 rendering it useless.
+  rpath = "${lib.makeLibraryPath runtimeDependencies}:${stdenv.cc.cc.lib}/lib64:${stdenv.cc.cc.lib}/aarch64-unknown-linux-gnu/lib64";
 
   unpackPhase = ''
     sh $src --keep --noexec
